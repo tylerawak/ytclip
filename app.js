@@ -157,7 +157,7 @@ function extractVideoId(input) {
 
 function buildShareUrl() {
   if (!state.videoId) return '';
-  return `https://ytclip.tyler-971.workers.dev/?v=${state.videoId}&st=${state.startTime.toFixed(1)}&et=${state.endTime.toFixed(1)}`;
+  return `https://ytclip.tylerawak.net/?v=${state.videoId}&st=${state.startTime.toFixed(1)}&et=${state.endTime.toFixed(1)}`;
 }
 
 function loadFromQueryString() {
