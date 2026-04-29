@@ -158,7 +158,7 @@ function extractVideoId(input) {
 
 function buildShareUrl() {
   if (!state.videoId) return '';
-  const base = window.location.origin + window.location.pathname;
+  const base = window.location.href.replace(/[^/]*$/, 'clip.html').split('?')[0];
   return `${base}?v=${state.videoId}&st=${state.startTime.toFixed(1)}&et=${state.endTime.toFixed(1)}`;
 }
 
