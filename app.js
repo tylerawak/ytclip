@@ -88,7 +88,6 @@ function startLoop() {
   if (rafId) return;
   (function tick() {
     syncDisplay();
-    if (state.previewing) checkPreviewBounds();
     rafId = requestAnimationFrame(tick);
   })();
 }
@@ -111,27 +110,23 @@ function syncDisplay() {
 
 // ─── Preview ─────────────────────────────────────────────────────────────────
 
-function checkPreviewBounds() {
-  if (!player) return;
-  const t = player.getCurrentTime();
-  if (t >= state.endTime) {
-    player.seekTo(state.startTime, true);
-    player.pauseVideo();
-    endPreview();
-  }
-}
-
 function startPreview() {
   if (!player) return;
   if (state.endTime <= state.startTime) {
     showError('End time must be after start time.');
     return;
   }
+  clearError();
   state.previewing = true;
   previewBtn.classList.add('previewing');
   previewBtn.textContent = 'Stop Preview';
-  player.seekTo(state.startTime, true);
-  player.playVideo();
+  // loadVideoById with endSeconds lets the YouTube player stop natively,
+  // firing ENDED reliably — much more robust than RAF-based bounds checking.
+  player.loadVideoById({
+    videoId: state.videoId,
+    startSeconds: state.startTime,
+    endSeconds: state.endTime,
+  });
 }
 
 function endPreview() {
