@@ -61,6 +61,7 @@ function initPlayer(videoId) {
 function onPlayerReady(e) {
   state.duration = player.getDuration();
   durationDisp.textContent = formatTime(state.duration);
+  if (state.startTime > 0) player.seekTo(state.startTime, true);
   startLoop();
 }
 
@@ -249,9 +250,9 @@ function updateEndpointDisplays() {
 
 function updateShareUrl() {
   shareUrlInput.value = buildShareUrl();
-  // Keep the editor URL in sync so it can be shared directly
+  // Keep the URL in sync so it can be shared directly from the address bar
   if (state.videoId) {
-    history.replaceState(null, '', `/edit?v=${state.videoId}&st=${state.startTime.toFixed(1)}&et=${state.endTime.toFixed(1)}`);
+    history.replaceState(null, '', `/?v=${state.videoId}&st=${state.startTime.toFixed(1)}&et=${state.endTime.toFixed(1)}`);
   }
 }
 
