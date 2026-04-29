@@ -46,11 +46,10 @@ function initPlayer(videoId) {
   player = new YT.Player('player', {
     videoId,
     playerVars: {
-      controls: 0,
-      disablekb: 1,
+      controls: 1,
+      disablekb: 0,
       modestbranding: 1,
       rel: 0,
-      fs: 0,
     },
     events: {
       onReady: onPlayerReady,
@@ -192,6 +191,36 @@ function roundTenth(n) {
   return Math.round(n * 10) / 10;
 }
 
+// Accepts "1:23.4", "1:23", "83.4", "83" — returns seconds or null on bad input
+function parseTimeInput(str) {
+  str = str.trim();
+  const colonForm = str.match(/^(\d+):(\d{1,2})(\.\d)?$/);
+  if (colonForm) {
+    const mins = parseInt(colonForm[1], 10);
+    const secs = parseFloat(colonForm[2] + (colonForm[3] || '.0'));
+    return roundTenth(mins * 60 + secs);
+  }
+  const n = parseFloat(str);
+  return isFinite(n) && n >= 0 ? roundTenth(n) : null;
+}
+
+function commitTimeInput(target, raw) {
+  const dur = state.duration || (player ? player.getDuration() : 0) || 9999;
+  const parsed = parseTimeInput(raw);
+  if (parsed === null) {
+    // Revert to last good value
+    updateEndpointDisplays();
+    return;
+  }
+  if (target === 'start') {
+    state.startTime = clamp(parsed, 0, state.endTime > 0 ? state.endTime : dur);
+  } else {
+    state.endTime = clamp(parsed, state.startTime, dur);
+  }
+  updateEndpointDisplays();
+  updateShareUrl();
+}
+
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
@@ -301,6 +330,31 @@ document.querySelectorAll('.set-btn').forEach((btn) => {
     updateEndpointDisplays();
     updateShareUrl();
   });
+});
+
+// Editable start/end time inputs
+[startTimeInput, endTimeInput].forEach((input) => {
+  const target = input.id === 'start-time' ? 'start' : 'end';
+
+  input.addEventListener('focus', () => input.select());
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { input.blur(); return; }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const dir = e.key === 'ArrowUp' ? 1 : -1;
+      const dur = state.duration || (player ? player.getDuration() : 0) || 9999;
+      if (target === 'start') {
+        state.startTime = roundTenth(clamp(state.startTime + dir * STEP, 0, state.endTime || dur));
+      } else {
+        state.endTime = roundTenth(clamp(state.endTime + dir * STEP, state.startTime, dur));
+      }
+      updateEndpointDisplays();
+      updateShareUrl();
+    }
+  });
+
+  input.addEventListener('blur', () => commitTimeInput(target, input.value));
 });
 
 previewBtn.addEventListener('click', () => {

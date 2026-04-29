@@ -281,8 +281,12 @@ button:active {
   width: 72px;
   padding: 5px 4px;
   outline: none;
-  cursor: default;
-  caret-color: transparent;
+  cursor: text;
+  transition: border-color 0.15s;
+}
+
+.time-input:focus {
+  border-color: var(--accent);
 }
 
 .set-btn {
