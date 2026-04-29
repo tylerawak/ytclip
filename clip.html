@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--
+    OpenGraph tags are populated by the inline script below, which reads
+    the query parameters before the page renders.  A proper server-side
+    host (e.g. Next.js / Vercel) can set these server-side for better
+    Discord embed support.
+  -->
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var v  = params.get('v')  || '';
+      var st = params.get('st') || '0';
+      var et = params.get('et') || '';
+      var title = 'YTClip – youtube.com/watch?v=' + v
+        + ' [' + st + 's → ' + (et || '?') + 's]';
+      var thumb = 'https://img.youtube.com/vi/' + v + '/hqdefault.jpg';
+      var url   = location.href;
+
+      document.write(
+        '<title>' + title + '<\/title>' +
+        '<meta property="og:title" content="' + title + '" />' +
+        '<meta property="og:image" content="' + thumb + '" />' +
+        '<meta property="og:url"   content="' + url   + '" />' +
+        '<meta property="og:type"  content="website" />' +
+        '<meta name="twitter:card"  content="summary_large_image" />' +
+        '<meta name="twitter:title" content="' + title + '" />' +
+        '<meta name="twitter:image" content="' + thumb + '" />'
+      );
+    })();
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    #clip-view {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 16px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .clip-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .clip-header h1 { font-size: 1.4rem; color: var(--accent); }
+    .clip-meta { color: var(--text-dim); font-size: 13px; }
+    #edit-link {
+      display: inline-block;
+      margin-top: 8px;
+      color: var(--text-dim);
+      font-size: 12px;
+      text-decoration: none;
+    }
+    #edit-link:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div id="clip-view">
+    <div class="clip-header">
+      <h1>YTClip</h1>
+      <span class="clip-meta" id="clip-meta"></span>
+    </div>
+
+    <div id="player-wrapper">
+      <div id="player"></div>
+    </div>
+
+    <div id="controls">
+      <div class="control-row playback-row">
+        <button id="play-pause-btn" class="icon-btn">&#9654;</button>
+        <span id="current-time-display" class="time-display">0:00.0</span>
+        <span class="time-sep">/</span>
+        <span id="clip-length-display" class="time-display">0:00.0</span>
+        <span style="color:var(--text-dim);font-size:12px;margin-left:4px;">(clip length)</span>
+      </div>
+      <div class="control-row scrubber-row">
+        <input type="range" id="scrubber" min="0" max="1000" value="0" step="1" />
+      </div>
+    </div>
+
+    <a id="edit-link" href="#">&#8592; Edit this clip in YTClip</a>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    var params  = new URLSearchParams(location.search);
+    var videoId = params.get('v')  || '';
+    var startT  = parseFloat(params.get('st')) || 0;
+    var endT    = parseFloat(params.get('et')) || 0;
+
+    // Populate meta label
+    document.getElementById('clip-meta').textContent =
+      formatTime(startT) + ' → ' + formatTime(endT);
+
+    // Edit link points back to the editor with same params
+    document.getElementById('edit-link').href = 'index.html' + location.search;
+
+    // Clip length display
+    document.getElementById('clip-length-display').textContent =
+      formatTime(Math.max(0, endT - startT));
+
+    var player, rafId;
+
+    window.onYouTubeIframeAPIReady = function () {
+      player = new YT.Player('player', {
+        videoId: videoId,
+        playerVars: {
+          controls: 0,
+          disablekb: 1,
+          modestbranding: 1,
+          rel: 0,
+          fs: 0,
+          start: Math.floor(startT),
+        },
+        events: {
+          onReady: function () {
+            player.seekTo(startT, true);
+            player.pauseVideo();
+          },
+          onStateChange: function (e) {
+            var playing = e.data === YT.PlayerState.PLAYING;
+            document.getElementById('play-pause-btn').innerHTML =
+              playing ? '&#9646;&#9646;' : '&#9654;';
+            if (playing) startLoop(); else stopLoop();
+          },
+        },
+      });
+    };
+
+    function startLoop() {
+      if (rafId) return;
+      (function tick() {
+        sync();
+        rafId = requestAnimationFrame(tick);
+      })();
+    }
+
+    function stopLoop() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    function sync() {
+      if (!player || typeof player.getCurrentTime !== 'function') return;
+      var t = player.getCurrentTime();
+      var rel = Math.max(0, t - startT);
+      document.getElementById('current-time-display').textContent = formatTime(rel);
+      var clipLen = Math.max(0.001, endT - startT);
+      document.getElementById('scrubber').value = Math.round((rel / clipLen) * 1000);
+      if (t >= endT) {
+        player.seekTo(startT, true);
+        player.pauseVideo();
+      }
+    }
+
+    document.getElementById('play-pause-btn').addEventListener('click', function () {
+      if (!player) return;
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
+      } else {
+        player.seekTo(startT, true);
+        player.playVideo();
+      }
+    });
+
+    document.getElementById('scrubber').addEventListener('input', function () {
+      if (!player) return;
+      var clipLen = Math.max(0.001, endT - startT);
+      var t = startT + (this.value / 1000) * clipLen;
+      player.seekTo(t, true);
+    });
+
+    function formatTime(s) {
+      s = Math.max(0, s);
+      var m = Math.floor(s / 60);
+      var sec = (s % 60).toFixed(1).padStart(4, '0');
+      return m + ':' + sec;
+    }
+  </script>
+</body>
+</html>

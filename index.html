@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YTClip</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>YTClip</h1>
+      <p class="subtitle">Clip any YouTube video to the tenth of a second</p>
+    </header>
+
+    <section id="url-input-section">
+      <div class="input-row">
+        <input
+          type="text"
+          id="yt-url"
+          placeholder="Paste a YouTube URL…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="load-btn">Load</button>
+      </div>
+      <p id="url-error" class="error hidden"></p>
+    </section>
+
+    <section id="player-section" class="hidden">
+      <div id="player-wrapper">
+        <div id="player"></div>
+      </div>
+
+      <div id="controls">
+        <!-- Playback -->
+        <div class="control-row playback-row">
+          <button id="play-pause-btn" class="icon-btn" title="Play / Pause">&#9654;</button>
+          <span id="current-time-display" class="time-display">0:00.0</span>
+          <span class="time-sep">/</span>
+          <span id="duration-display" class="time-display">0:00.0</span>
+        </div>
+
+        <!-- Timeline scrubber -->
+        <div class="control-row scrubber-row">
+          <input type="range" id="scrubber" min="0" max="1000" value="0" step="1" />
+        </div>
+
+        <!-- Start / End pickers -->
+        <div class="control-row endpoints-row">
+          <div class="endpoint-group">
+            <label>Start</label>
+            <div class="time-controls">
+              <button class="step-btn" data-target="start" data-dir="-1">&#8722;</button>
+              <input type="text" id="start-time" class="time-input" value="0.0" readonly />
+              <button class="step-btn" data-target="start" data-dir="1">&#43;</button>
+            </div>
+            <button class="set-btn" data-target="start">Set to current</button>
+          </div>
+
+          <div class="clip-duration">
+            <span id="clip-duration-label">0.0s</span>
+            <span class="clip-duration-sub">clip length</span>
+          </div>
+
+          <div class="endpoint-group">
+            <label>End</label>
+            <div class="time-controls">
+              <button class="step-btn" data-target="end" data-dir="-1">&#8722;</button>
+              <input type="text" id="end-time" class="time-input" value="0.0" readonly />
+              <button class="step-btn" data-target="end" data-dir="1">&#43;</button>
+            </div>
+            <button class="set-btn" data-target="end">Set to current</button>
+          </div>
+        </div>
+
+        <!-- Preview toggle -->
+        <div class="control-row preview-row">
+          <button id="preview-btn">Preview Clip</button>
+        </div>
+      </div>
+
+      <!-- Share -->
+      <div id="share-section">
+        <label for="share-url">Clip URL</label>
+        <div class="share-row">
+          <input type="text" id="share-url" readonly />
+          <button id="copy-btn">Copy</button>
+        </div>
+        <p id="copy-confirm" class="copy-confirm hidden">Copied!</p>
+        <p class="embed-note">
+          Paste this URL in Discord or any chat — it will preview the clip in the browser.
+          For a full video embed, a server-side host is required.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="app.js"></script>
+</body>
+</html>
