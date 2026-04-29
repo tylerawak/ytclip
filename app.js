@@ -249,6 +249,10 @@ function updateEndpointDisplays() {
 
 function updateShareUrl() {
   shareUrlInput.value = buildShareUrl();
+  // Keep the editor URL in sync so it can be shared directly
+  if (state.videoId) {
+    history.replaceState(null, '', `/edit?v=${state.videoId}&st=${state.startTime.toFixed(1)}&et=${state.endTime.toFixed(1)}`);
+  }
 }
 
 // ─── Event handlers ──────────────────────────────────────────────────────────
