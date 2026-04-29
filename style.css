@@ -425,7 +425,7 @@ button:active {
 }
 
 /* ── Mobile ────────────────────────────────────────────────────────────────── */
-@media (max-width: 520px) {
+@media (max-width: 768px) {
   #app {
     padding: 20px 12px 48px;
   }
