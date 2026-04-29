@@ -423,3 +423,67 @@ button:active {
 .hidden {
   display: none !important;
 }
+
+/* ── Mobile ────────────────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  #app {
+    padding: 20px 12px 48px;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Stack URL input + button */
+  .input-row {
+    flex-direction: column;
+  }
+
+  /* Stack Start / duration / End vertically */
+  .endpoints-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .endpoint-group {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex: unset;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+  }
+
+  .endpoint-group label {
+    min-width: 36px;
+  }
+
+  .set-btn {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  /* Clip duration centered between the two groups */
+  .clip-duration {
+    flex-direction: row;
+    justify-content: center;
+    gap: 6px;
+    min-width: unset;
+  }
+
+  #clip-duration-label {
+    font-size: 15px;
+  }
+
+  /* Share URL wraps onto two lines */
+  .share-row {
+    flex-direction: column;
+  }
+
+  #copy-btn {
+    width: 100%;
+  }
+}
