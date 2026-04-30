@@ -27,23 +27,61 @@ body {
   min-height: 100vh;
 }
 
+/* Site header */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 14px 24px;
+  background: rgba(8, 8, 8, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255, 64, 0, 0.15);
+}
+
+.site-logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+.site-logo:hover { transform: scale(1.05); }
+.site-logo span {
+  color: var(--accent);
+  text-shadow: 0 0 20px var(--accent);
+}
+
+.site-tool-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
 #app {
   max-width: 900px;
   margin: 0 auto;
-  padding: 32px 16px 64px;
+  padding: 80px 16px 32px;
 }
 
-/* Header */
-header {
+/* Tool intro */
+.tool-intro {
   text-align: center;
   margin-bottom: 32px;
 }
 
-header h1 {
+.tool-intro h1 {
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--accent);
+  text-shadow: 0 0 30px rgba(255, 64, 0, 0.4);
 }
 
 .subtitle {
@@ -51,6 +89,20 @@ header h1 {
   margin-top: 4px;
   font-size: 13px;
 }
+
+/* Site footer */
+.site-footer {
+  text-align: center;
+  padding: 24px 16px 32px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.site-footer a:hover { opacity: 0.7; }
 
 /* URL input */
 #url-input-section {
@@ -87,7 +139,7 @@ button {
   font-size: 14px;
   font-weight: 600;
   padding: 10px 20px;
-  transition: background 0.15s, opacity 0.15s;
+  transition: background 0.15s, opacity 0.15s, box-shadow 0.15s;
   white-space: nowrap;
 }
 
@@ -97,6 +149,13 @@ button:hover {
 
 button:active {
   opacity: 0.8;
+}
+
+#load-btn, #copy-btn {
+  box-shadow: 0 0 20px rgba(255, 64, 0, 0.35);
+}
+#load-btn:hover, #copy-btn:hover {
+  box-shadow: 0 0 35px rgba(255, 64, 0, 0.55);
 }
 
 .error {
